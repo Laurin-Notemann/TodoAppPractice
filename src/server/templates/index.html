@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Todo App Test</title>
+    <meta name="description" content="Small Todo-List">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body,
+        div,
+        span,
+        applet,
+        object,
+        iframe,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        blockquote,
+        pre,
+        a,
+        abbr,
+        acronym,
+        address,
+        big,
+        cite,
+        code,
+        del,
+        dfn,
+        em,
+        img,
+        ins,
+        kbd,
+        q,
+        s,
+        samp,
+        small,
+        strike,
+        strong,
+        sub,
+        sup,
+        tt,
+        var,
+        b,
+        u,
+        i,
+        center,
+        dl,
+        dt,
+        dd,
+        ol,
+        ul,
+        li,
+        fieldset,
+        form,
+        label,
+        legend,
+        table,
+        caption,
+        tbody,
+        tfoot,
+        thead,
+        tr,
+        th,
+        td,
+        article,
+        aside,
+        canvas,
+        details,
+        embed,
+        figure,
+        figcaption,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        output,
+        ruby,
+        section,
+        summary,
+        time,
+        mark,
+        audio,
+        video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        /* HTML5 display-role reset for older browsers */
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        section {
+            display: block;
+        }
+
+        body {
+            line-height: 1;
+        }
+
+        ol,
+        ul {
+            list-style: none;
+        }
+
+        blockquote,
+        q {
+            quotes: none;
+        }
+
+        blockquote:before,
+        blockquote:after,
+        q:before,
+        q:after {
+            content: '';
+            content: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        /* actual styling starts here */
+
+        body {
+            background: #111;
+
+            font-family: Avenir;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            width: 100%;
+            height: 100%;
+        }
+
+        .mainColumn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            width: calc(100% - 2rem);
+            max-width: 32rem;
+            margin-top: 8rem;
+        }
+
+        .todo-container {
+
+            display: flex;
+            flex-direction: column;
+
+            background: white;
+            border-radius: 2px;
+
+            width: 100%;
+            padding: 3rem 2rem;
+
+            font-weight: bold;
+        }
+
+        .button {
+            --height: 3rem;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: var(--height);
+
+            border-radius: 2px;
+
+            cursor: pointer;
+            border: none;
+
+            transition-duration: 0.1s;
+
+            font-weight: bold;
+        }
+
+        .button.long {
+            width: 100%;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .button.pill {
+            width: 100%;
+
+            border-radius: calc(var(--height) / 2);
+        }
+
+        .button.primary {
+            background: white;
+            color: #222;
+        }
+
+        .button.primary:hover {
+            filter: brightness(0.92);
+        }
+
+        .todo {
+            display: flex;
+            align-items: center;
+
+            height: 3rem;
+            padding-left: 1rem;
+        }
+
+        .todo h2 {
+            font-weight: normal;
+
+            color: #222;
+
+
+        }
+
+        .todo:not(:last-child) {
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .button.square {
+            width: var(--height);
+        }
+
+        h1 {
+            margin-bottom: 3rem;
+
+            font-size: 1.2rem;
+        }
+
+        .textInput {
+
+            color: #222;
+
+            height: 3rem;
+
+            width: 66%;
+
+            padding: 0 1rem;
+
+            background: white;
+
+            border: none;
+
+            border-radius: 2px;
+        }
+
+        .todo__date {
+
+            font-weight: normal;
+
+            color: #444;
+
+            font-size: 0.6rem;
+        }
+
+        .todo__info-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+
+            height: 100%;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="mainColumn">
+            <div class="todo-container">
+                <h1 class="title">
+                    Best todo app there is
+                </h1>
+                <div data-slot="todo-container">
+                    Loading...
+                </div>
+            </div>
+
+            <form style="width: 100%" data-form="new-todo">
+                <div style="width: 100%; margin-top: 1rem">
+                    <input class="textInput" placeholder="Todo title..." data-input="new-todo-title">
+                </div>
+                <div style="width: 100%; margin-top: 1rem">
+                    <button class="button long pill primary">Add todo</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        // iife to not leak variables into the global scope
+        (() => {
+            const todoContainerEl = document.querySelector(`[data-slot="todo-container"]`)
+            const newTodoTitleEl = document.querySelector(`[data-input="new-todo-title"]`)
+            const newTodoFormEl = document.querySelector(`[data-form="new-todo"]`)
+
+            newTodoFormEl.addEventListener("submit", async e => {
+
+                // prevent page from reloading
+                e.preventDefault()
+
+                const todo_entry = newTodoTitleEl.value
+
+                newTodoTitleEl.value = ""
+
+                const date = new Date()
+
+                const todoData = {
+                    todo_entry,
+                    date,
+                }
+                await createTodo(todoData)
+
+                updateDisplayedTodos()
+            })
+
+            async function createTodo(todoData) {
+
+                try {
+
+                    const body = JSON.stringify(todoData)
+
+                    const res = await fetch("/api/todo", {
+                        method: "POST", body, headers: {
+
+                            "Content-Type": "application/json"
+                        }
+                    })
+
+                    if (!res.ok) {
+
+                        return [res, null]
+                    }
+                    const json = await res.json()
+
+                    const todo = json.todo
+
+                    return [null, todo]
+
+                } catch (err) {
+
+                    return [err, null]
+                }
+            }
+            async function getTodos() {
+
+                try {
+
+                    const res = await fetch("/api/todo")
+
+                    if (!res.ok) {
+
+                        return [res, null]
+                    }
+                    const json = await res.json()
+
+                    const todos = json
+
+                    return [null, todos]
+
+                } catch (err) {
+
+                    return [err, null]
+                }
+            }
+            async function updateTodo(todoId, todoData) {
+
+                try {
+
+                    const res = await fetch("/api/todo/" + todoId, {
+                        method: "PUT", body: JSON.stringify(todoData), headers: {
+
+                            "Content-Type": "application/json"
+                        }
+                    })
+
+                    if (!res.ok) {
+
+                        return [res, null]
+                    }
+                    const json = await res.json()
+
+                    const todo = json.todo
+
+                    return [null, todo]
+
+                } catch (err) {
+
+                    return [err, null]
+                }
+            }
+            async function deleteTodo(todoId) {
+
+                try {
+
+                    const res = await fetch("/api/todo/" + todoId, { method: "DELETE" })
+
+                    if (!res.ok) {
+
+                        return [res, null]
+                    }
+                    return [null, true]
+
+                } catch (err) {
+
+                    return [err, null]
+                }
+            }
+            async function updateDisplayedTodos() {
+
+                const [fetchTodosErr, todos] = await getTodos()
+
+                if (fetchTodosErr != null) {
+
+                    todoContainerEl.innerHTML = "Error: failed to fetch todos"
+
+                    return
+                }
+                todoContainerEl.innerHTML = ""
+
+                todos
+                    .map(createTodoEl)
+                    .map(i => todoContainerEl.appendChild(i))
+            }
+            async function editTodo(d) {
+
+                alert("not implemented yet")
+            }
+            function createTodoEl(todo) {
+
+                const todoEl = document.createElement("div");
+
+                todoEl.classList.add("todo")
+
+                const todoTitle = document.createElement("h2")
+
+                const todoDate = document.createElement("span")
+
+                todoDate.classList.add("todo__date")
+
+                todoDate.innerText = new Date(todo.date).toLocaleDateString("en-US")
+
+                const deleteButton = document.createElement("button")
+
+                deleteButton.classList.add("button")
+                deleteButton.classList.add("square")
+                deleteButton.classList.add("primary")
+
+                todoTitle.contentEditable = true
+
+                todoTitle.addEventListener("blur", e => {
+
+                    const todo_entry = e.currentTarget.innerText
+                    const date = todo.date
+
+                    const todoData = {
+                        todo_entry,
+                        date,
+                    }
+                    updateTodo(todo.id, todoData).then(updateDisplayedTodos)
+
+                })
+
+                const todoInfoContainer = document.createElement("div")
+
+                todoInfoContainer.classList.add("todo__info-container")
+
+                deleteButton.style.setProperty("--height", "2.8rem")
+
+                deleteButton.innerText = "X"
+
+                deleteButton.addEventListener("click", () => { deleteTodo(todo.id).then(updateDisplayedTodos) })
+
+                const editButton = document.createElement("button")
+
+                editButton.classList.add("button")
+                editButton.classList.add("square")
+                editButton.classList.add("primary")
+
+                editButton.style.setProperty("--height", "2.8rem")
+
+                editButton.innerText = "E"
+
+                editButton.addEventListener("click", () => { editTodo(todo.id) })
+
+                todoTitle.innerText = todo.todo_entry
+
+                todoInfoContainer.appendChild(todoTitle)
+
+                todoInfoContainer.appendChild(todoDate)
+
+                todoEl.appendChild(todoInfoContainer)
+
+                // todoEl.appendChild(editButton)
+
+                todoEl.appendChild(deleteButton)
+
+                return todoEl
+            }
+            updateDisplayedTodos()
+        })()
+    </script>
+</body>
+
+</html>
