@@ -19,7 +19,7 @@ path\to\venv\Scripts\activate.bat
 ```
 ### Install dependecies:
 ```bash
-pip install
+ pip install -r requirements.txt
 ```
 
 ## Now create a .env file in the project directory. 

@@ -2,8 +2,8 @@ import os
 from os.path import join
 from dotenv import load_dotenv
 
-dotenv_path = join("../pythonTestPostgres_Python", '.env')
+path = os.getcwd()
+dotenv_path = join(path, '.env')
 load_dotenv(dotenv_path)
 
-DATABASE_DNS = os.environ.get("DATABASE_DNS")
 DATABASE_URI = os.environ.get("DATABASE_URI")
